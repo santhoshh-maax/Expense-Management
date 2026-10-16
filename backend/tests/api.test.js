@@ -3,8 +3,8 @@ const assert = require('node:assert');
 const request = require('supertest');
 const app = require('../src/app');
 
-// Using mock token supported by MockAuth in development/test mode
-const TEST_TOKEN = 'mock-token-test-user-999';
+// Using mock token with timestamp for clean isolated test runs
+const TEST_TOKEN = `mock-token-test-user-${Date.now()}`;
 
 describe('Express REST API Automated Test Suite', () => {
   it('1. GET /api/v1/health should return 200 and healthy status', async () => {
