@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transactions - Smart Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase App & Auth SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <div class="sidebar-backdrop"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i data-lucide="wallet"></i>
+        </div>
+        <div class="sidebar-brand-text">
+          <h2>SmartExpense</h2>
+          <p>Financial Control</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i> Overview
+        </a>
+        <a href="transactions.html" class="nav-item active">
+          <i data-lucide="arrow-left-right"></i> Transactions
+        </a>
+        <a href="budgets.html" class="nav-item">
+          <i data-lucide="target"></i> Budgets
+        </a>
+        <a href="reports.html" class="nav-item">
+          <i data-lucide="bar-chart-3"></i> Reports
+        </a>
+        <a href="categories.html" class="nav-item">
+          <i data-lucide="tags"></i> Categories
+        </a>
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" id="logout-nav-btn" class="nav-item logout-nav-item">
+          <i data-lucide="log-out"></i> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Transaction History</h1>
+            <p>View, filter, edit, and record your income and expense entries</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button type="button" id="add-transaction-page-btn" class="btn btn-primary">
+            <i data-lucide="plus"></i> Add Transaction
+          </button>
+
+          <div class="user-profile-badge">
+            <div id="user-avatar-initials" class="user-avatar">U</div>
+            <span id="user-display-name">User</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <!-- Filter Bar Card -->
+        <div class="chart-card col-12" style="margin-bottom: 24px; padding: 20px;">
+          <div class="form-row" style="align-items: flex-end;">
+            <!-- Search -->
+            <div class="form-group" style="flex: 2; min-width: 200px; margin-bottom: 0;">
+              <label for="filter-search">Search Description / Notes</label>
+              <input type="search" id="filter-search" class="form-control" placeholder="Search by title, notes, or amount...">
+            </div>
+
+            <!-- Type -->
+            <div class="form-group" style="flex: 1; min-width: 130px; margin-bottom: 0;">
+              <label for="filter-type">Type</label>
+              <select id="filter-type" class="form-control">
+                <option value="all">All Types</option>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+              <label for="filter-category">Category</label>
+              <select id="filter-category" class="form-control">
+                <option value="all">All Categories</option>
+              </select>
+            </div>
+
+            <!-- Start Date -->
+            <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+              <label for="filter-start-date">From Date</label>
+              <input type="date" id="filter-start-date" class="form-control">
+            </div>
+
+            <!-- End Date -->
+            <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+              <label for="filter-end-date">To Date</label>
+              <input type="date" id="filter-end-date" class="form-control">
+            </div>
+
+            <!-- Sort -->
+            <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+              <label for="filter-sort">Sort By</label>
+              <select id="filter-sort" class="form-control">
+                <option value="date_desc">Date (Newest first)</option>
+                <option value="date_asc">Date (Oldest first)</option>
+                <option value="amount_desc">Amount (Highest first)</option>
+                <option value="amount_asc">Amount (Lowest first)</option>
+              </select>
+            </div>
+
+            <!-- Clear -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <button type="button" id="filter-clear-btn" class="btn btn-secondary" style="height: 42px;">
+                <i data-lucide="rotate-ccw"></i> Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Title / Notes</th>
+                <th>Category</th>
+                <th>Payment Method</th>
+                <th>Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="transactions-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+
+          <div id="transactions-empty-state" class="empty-state" style="display:none;">
+            <div class="empty-state-icon">
+              <i data-lucide="search-x"></i>
+            </div>
+            <h3>No Transactions Found</h3>
+            <p>No records match your selected filter criteria. Try adjusting your filters or record a new transaction.</p>
+          </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="pagination-controls" style="display:flex; justify-content:space-between; align-items:center; margin-top: 20px; padding: 0 4px;">
+          <span id="page-info" class="text-muted" style="font-size: 13px;">Page 1 of 1</span>
+          <div style="display:flex; gap: 8px;">
+            <button type="button" id="prev-page-btn" class="btn btn-secondary btn-sm" disabled>
+              <i data-lucide="chevron-left"></i> Previous
+            </button>
+            <button type="button" id="next-page-btn" class="btn btn-secondary btn-sm" disabled>
+              Next <i data-lucide="chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  <div id="transaction-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Transaction</h3>
+        <button type="button" id="modal-close-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <form id="transaction-form">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tx-type">Transaction Type *</label>
+              <select id="tx-type" class="form-control" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="tx-amount">Amount *</label>
+              <input type="number" id="tx-amount" class="form-control" placeholder="0.00" min="0.01" step="0.01" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tx-title">Title / Description *</label>
+            <input type="text" id="tx-title" class="form-control" placeholder="e.g. Weekly Groceries" required maxlength="120">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tx-category">Category *</label>
+              <select id="tx-category" class="form-control" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="tx-date">Date *</label>
+              <input type="date" id="tx-date" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tx-payment-method">Payment Method</label>
+              <select id="tx-payment-method" class="form-control">
+                <option value="Cash">Cash</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="UPI">UPI / Digital Wallet</option>
+                <option value="Net Banking">Net Banking</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tx-notes">Optional Notes</label>
+            <textarea id="tx-notes" class="form-control" rows="2" placeholder="Additional details..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="tx-submit-btn" class="btn btn-primary">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/transactions.js"></script>
+</body>
+</html>

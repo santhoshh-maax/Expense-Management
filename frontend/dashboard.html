@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Smart Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <!-- Lucide Icons & Chart.js -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Firebase App & Auth SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <div class="sidebar-backdrop"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i data-lucide="wallet"></i>
+        </div>
+        <div class="sidebar-brand-text">
+          <h2>SmartExpense</h2>
+          <p>Financial Control</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active">
+          <i data-lucide="layout-dashboard"></i> Overview
+        </a>
+        <a href="transactions.html" class="nav-item">
+          <i data-lucide="arrow-left-right"></i> Transactions
+        </a>
+        <a href="budgets.html" class="nav-item">
+          <i data-lucide="target"></i> Budgets
+        </a>
+        <a href="reports.html" class="nav-item">
+          <i data-lucide="bar-chart-3"></i> Reports
+        </a>
+        <a href="categories.html" class="nav-item">
+          <i data-lucide="tags"></i> Categories
+        </a>
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" id="logout-nav-btn" class="nav-item logout-nav-item">
+          <i data-lucide="log-out"></i> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Navigation -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Dashboard Overview</h1>
+            <p>Monitor your cash flow, expenses, and budget usage</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Reporting Period Selector -->
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="dashboard-month-select" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select id="dashboard-year-select" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;">
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+
+          <!-- Add Transaction Button -->
+          <button type="button" id="topbar-add-expense-btn" class="btn btn-primary">
+            <i data-lucide="plus"></i> Add Transaction
+          </button>
+
+          <!-- User Profile -->
+          <div class="user-profile-badge">
+            <div id="user-avatar-initials" class="user-avatar">U</div>
+            <span id="user-display-name">User</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Body -->
+      <main class="content-body">
+        <!-- Metrics Cards -->
+        <section class="metrics-grid">
+          <!-- 1. Total Balance -->
+          <div class="metric-card">
+            <div class="metric-content">
+              <h3>Total Balance</h3>
+              <div id="card-total-balance" class="metric-value">₹0.00</div>
+              <p class="metric-subtext">Overall cumulative balance</p>
+            </div>
+            <div class="metric-icon-box blue">
+              <i data-lucide="landmark"></i>
+            </div>
+          </div>
+
+          <!-- 2. Total Income -->
+          <div class="metric-card">
+            <div class="metric-content">
+              <h3>Monthly Income</h3>
+              <div id="card-period-income" class="metric-value text-success">₹0.00</div>
+              <p class="metric-subtext">For selected period</p>
+            </div>
+            <div class="metric-icon-box green">
+              <i data-lucide="arrow-down-left"></i>
+            </div>
+          </div>
+
+          <!-- 3. Total Expenses -->
+          <div class="metric-card">
+            <div class="metric-content">
+              <h3>Monthly Expenses</h3>
+              <div id="card-period-expense" class="metric-value text-danger">₹0.00</div>
+              <p class="metric-subtext">For selected period</p>
+            </div>
+            <div class="metric-icon-box red">
+              <i data-lucide="arrow-up-right"></i>
+            </div>
+          </div>
+
+          <!-- 4. Net Cash Flow -->
+          <div class="metric-card">
+            <div class="metric-content">
+              <h3>Net Cash Flow</h3>
+              <div id="card-net-cashflow" class="metric-value">₹0.00</div>
+              <p class="metric-subtext">Income minus expenses</p>
+            </div>
+            <div class="metric-icon-box blue">
+              <i data-lucide="scale"></i>
+            </div>
+          </div>
+
+          <!-- 5. Budget Usage -->
+          <div class="metric-card">
+            <div class="metric-content">
+              <h3>Budget Usage</h3>
+              <div id="card-budget-usage" class="metric-value">0%</div>
+              <p id="card-budget-subtext" class="metric-subtext">Monthly target limit</p>
+            </div>
+            <div class="metric-icon-box amber">
+              <i data-lucide="pie-chart"></i>
+            </div>
+          </div>
+        </section>
+
+        <!-- Charts Grid -->
+        <section class="charts-grid">
+          <!-- Expense Breakdown Doughnut -->
+          <div class="chart-card col-4">
+            <div class="chart-header">
+              <h2>Expense Breakdown</h2>
+            </div>
+            <div class="chart-container">
+              <canvas id="categoryDoughnutChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Spending Trends Line Chart -->
+          <div class="chart-card col-8">
+            <div class="chart-header">
+              <h2>Daily Spending Trend</h2>
+            </div>
+            <div class="chart-container">
+              <canvas id="spendingTrendsChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Income vs Expenses Bar Chart -->
+          <div class="chart-card col-12">
+            <div class="chart-header">
+              <h2>Income vs Expenses (Last 6 Months)</h2>
+            </div>
+            <div class="chart-container" style="min-height: 260px;">
+              <canvas id="incomeExpenseBarChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recent Transactions -->
+        <section class="chart-card col-12" style="margin-bottom: 24px;">
+          <div class="chart-header">
+            <h2>Recent Transactions</h2>
+            <a href="transactions.html" class="btn btn-secondary btn-sm">
+              View All Transactions <i data-lucide="arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody id="recent-transactions-tbody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+
+            <div id="recent-empty-state" class="empty-state" style="display:none;">
+              <div class="empty-state-icon">
+                <i data-lucide="receipt"></i>
+              </div>
+              <h3>No Transactions Yet</h3>
+              <p>Add your first income or expense to see it listed here.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add / Quick Transaction Modal -->
+  <div id="transaction-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Transaction</h3>
+        <button type="button" id="modal-close-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <form id="transaction-form">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tx-type">Transaction Type *</label>
+              <select id="tx-type" class="form-control" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="tx-amount">Amount *</label>
+              <input type="number" id="tx-amount" class="form-control" placeholder="0.00" min="0.01" step="0.01" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tx-title">Title / Description *</label>
+            <input type="text" id="tx-title" class="form-control" placeholder="e.g. Grocery store purchase" required maxlength="120">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tx-category">Category *</label>
+              <select id="tx-category" class="form-control" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="tx-date">Date *</label>
+              <input type="date" id="tx-date" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tx-payment-method">Payment Method</label>
+              <select id="tx-payment-method" class="form-control">
+                <option value="Cash">Cash</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="UPI">UPI / Digital Wallet</option>
+                <option value="Net Banking">Net Banking</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tx-notes">Optional Notes</label>
+            <textarea id="tx-notes" class="form-control" rows="2" placeholder="Additional details..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="tx-submit-btn" class="btn btn-primary">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

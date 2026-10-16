@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Smart Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase App & Auth SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <div class="sidebar-backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i data-lucide="wallet"></i>
+        </div>
+        <div class="sidebar-brand-text">
+          <h2>SmartExpense</h2>
+          <p>Financial Control</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i> Overview
+        </a>
+        <a href="transactions.html" class="nav-item">
+          <i data-lucide="arrow-left-right"></i> Transactions
+        </a>
+        <a href="budgets.html" class="nav-item">
+          <i data-lucide="target"></i> Budgets
+        </a>
+        <a href="reports.html" class="nav-item">
+          <i data-lucide="bar-chart-3"></i> Reports
+        </a>
+        <a href="categories.html" class="nav-item">
+          <i data-lucide="tags"></i> Categories
+        </a>
+        <a href="settings.html" class="nav-item active">
+          <i data-lucide="settings"></i> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" id="logout-nav-btn" class="nav-item logout-nav-item">
+          <i data-lucide="log-out"></i> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Settings & Preferences</h1>
+            <p>Customize currency display, date formats, and profile details</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="user-profile-badge">
+            <div id="user-avatar-initials" class="user-avatar">U</div>
+            <span id="user-display-name">User</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div style="max-width: 680px;">
+          <!-- Preferences Card -->
+          <div class="chart-card" style="margin-bottom: 24px;">
+            <div class="chart-header">
+              <h2>User Preferences</h2>
+            </div>
+
+            <form id="settings-form">
+              <div class="form-group">
+                <label for="settings-display-name">Display Name</label>
+                <input type="text" id="settings-display-name" class="form-control" placeholder="Your Name" required>
+              </div>
+
+              <div class="form-group">
+                <label for="settings-email">Email Address</label>
+                <input type="email" id="settings-email" class="form-control" disabled style="background:#f8fafc; cursor:not-allowed;">
+                <small class="text-muted">Managed via Firebase Authentication.</small>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="settings-currency">Primary Currency</label>
+                  <select id="settings-currency" class="form-control">
+                    <option value="INR">INR (₹ - Indian Rupee)</option>
+                    <option value="USD">USD ($ - US Dollar)</option>
+                    <option value="EUR">EUR (€ - Euro)</option>
+                    <option value="GBP">GBP (£ - British Pound)</option>
+                    <option value="CAD">CAD (CA$ - Canadian Dollar)</option>
+                    <option value="AUD">AUD (A$ - Australian Dollar)</option>
+                    <option value="JPY">JPY (¥ - Japanese Yen)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="settings-date-format">Date Display Format</label>
+                  <select id="settings-date-format" class="form-control">
+                    <option value="DD-MM-YYYY">DD/MM/YYYY (e.g. 15/10/2026)</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD (e.g. 2026-10-15)</option>
+                    <option value="MM/DD/YYYY">MM/DD/YYYY (e.g. 10/15/2026)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top: 24px;">
+                <button type="submit" id="settings-save-btn" class="btn btn-primary">
+                  Save Preferences
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Account Actions Card -->
+          <div class="chart-card" style="border-color: #fee2e2;">
+            <div class="chart-header">
+              <h2 style="color: var(--expense-red);">Account Actions</h2>
+            </div>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+              Sign out from this session or device.
+            </p>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('logout-nav-btn').click();">
+              <i data-lucide="log-out"></i> Sign Out
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

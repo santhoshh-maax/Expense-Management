@@ -1,0 +1,100 @@
+/* ==========================================================================
+   RESPONSIVE DESIGN & MOBILE DRAWER
+   ========================================================================== */
+
+/* Tablet & Mobile Screens (< 1024px) */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+    box-shadow: var(--shadow-modal);
+  }
+
+  .sidebar.drawer-open {
+    transform: translateX(0);
+  }
+
+  .main-wrapper {
+    margin-left: 0;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .charts-grid .chart-card.col-8,
+  .charts-grid .chart-card.col-4,
+  .charts-grid .chart-card.col-6 {
+    grid-column: span 12;
+  }
+
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    z-index: 95;
+  }
+
+  .sidebar-backdrop.active {
+    display: block;
+  }
+}
+
+/* Small Mobile Screens (< 640px) */
+@media (max-width: 640px) {
+  .topbar {
+    padding: 0 16px;
+    height: 60px;
+  }
+
+  .topbar-title h1 {
+    font-size: 17px;
+  }
+
+  .topbar-title p {
+    display: none;
+  }
+
+  .content-body {
+    padding: 16px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .metric-card {
+    padding: 16px;
+  }
+
+  .metric-content .metric-value {
+    font-size: 22px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+  }
+
+  .modal-card {
+    padding: 0;
+    width: 95%;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-actions {
+    padding: 16px;
+  }
+}

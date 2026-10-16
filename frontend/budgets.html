@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budgets - Smart Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase App & Auth SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <div class="sidebar-backdrop"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i data-lucide="wallet"></i>
+        </div>
+        <div class="sidebar-brand-text">
+          <h2>SmartExpense</h2>
+          <p>Financial Control</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i> Overview
+        </a>
+        <a href="transactions.html" class="nav-item">
+          <i data-lucide="arrow-left-right"></i> Transactions
+        </a>
+        <a href="budgets.html" class="nav-item active">
+          <i data-lucide="target"></i> Budgets
+        </a>
+        <a href="reports.html" class="nav-item">
+          <i data-lucide="bar-chart-3"></i> Reports
+        </a>
+        <a href="categories.html" class="nav-item">
+          <i data-lucide="tags"></i> Categories
+        </a>
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" id="logout-nav-btn" class="nav-item logout-nav-item">
+          <i data-lucide="log-out"></i> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Budget Management</h1>
+            <p>Set spending goals, control category limits, and prevent overspending</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Month / Year Selector -->
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="budget-month-select" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select id="budget-year-select" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;">
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+
+          <button type="button" id="add-budget-btn" class="btn btn-primary">
+            <i data-lucide="plus-circle"></i> Set Budget
+          </button>
+
+          <div class="user-profile-badge">
+            <div id="user-avatar-initials" class="user-avatar">U</div>
+            <span id="user-display-name">User</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <!-- Budgets Grid -->
+        <div id="budgets-grid" class="charts-grid">
+          <!-- Budget Cards rendered here -->
+        </div>
+
+        <div id="budgets-empty-state" class="empty-state" style="display:none;">
+          <div class="empty-state-icon">
+            <i data-lucide="target"></i>
+          </div>
+          <h3>No Budgets Set For This Month</h3>
+          <p>Create a monthly spending limit or assign category budgets to track your expenses.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Set Budget Modal -->
+  <div id="budget-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="budget-modal-title">Set Monthly Budget</h3>
+        <button type="button" id="budget-modal-close-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <form id="budget-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="budget-category">Target Category *</label>
+            <select id="budget-category" class="form-control" required>
+              <option value="all">Total Monthly Budget (All Expenses)</option>
+              <!-- Populated dynamically -->
+            </select>
+            <small class="text-muted">Choose "Total Monthly Budget" for overall cap or select a specific category.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="budget-amount">Maximum Spending Limit *</label>
+            <input type="number" id="budget-amount" class="form-control" placeholder="e.g. 25000" min="1" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="budget-modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="budget-submit-btn" class="btn btn-primary">Save Budget</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/budgets.js"></script>
+</body>
+</html>

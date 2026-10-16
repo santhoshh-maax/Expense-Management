@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories - Smart Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase App & Auth SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <div class="sidebar-backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i data-lucide="wallet"></i>
+        </div>
+        <div class="sidebar-brand-text">
+          <h2>SmartExpense</h2>
+          <p>Financial Control</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i> Overview
+        </a>
+        <a href="transactions.html" class="nav-item">
+          <i data-lucide="arrow-left-right"></i> Transactions
+        </a>
+        <a href="budgets.html" class="nav-item">
+          <i data-lucide="target"></i> Budgets
+        </a>
+        <a href="reports.html" class="nav-item">
+          <i data-lucide="bar-chart-3"></i> Reports
+        </a>
+        <a href="categories.html" class="nav-item active">
+          <i data-lucide="tags"></i> Categories
+        </a>
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" id="logout-nav-btn" class="nav-item logout-nav-item">
+          <i data-lucide="log-out"></i> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Category Management</h1>
+            <p>Customize expense and income categories with icons</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button type="button" id="add-category-btn" class="btn btn-primary">
+            <i data-lucide="plus"></i> Add Custom Category
+          </button>
+
+          <div class="user-profile-badge">
+            <div id="user-avatar-initials" class="user-avatar">U</div>
+            <span id="user-display-name">User</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <!-- Expense Categories Section -->
+        <div style="margin-bottom: 32px;">
+          <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display:flex; align-items:center; gap:8px;">
+            <i data-lucide="arrow-up-right" class="text-danger"></i> Expense Categories
+          </h2>
+          <div id="expense-categories-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Income Categories Section -->
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display:flex; align-items:center; gap:8px;">
+            <i data-lucide="arrow-down-left" class="text-success"></i> Income Categories
+          </h2>
+          <div id="income-categories-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div id="category-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Create Custom Category</h3>
+        <button type="button" id="cat-modal-close-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <form id="category-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="cat-name">Category Name *</label>
+            <input type="text" id="cat-name" class="form-control" placeholder="e.g. Gym & Fitness" required maxlength="50">
+          </div>
+
+          <div class="form-group">
+            <label for="cat-type">Category Type *</label>
+            <select id="cat-type" class="form-control" required>
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cat-icon">Icon Identifier</label>
+            <select id="cat-icon" class="form-control">
+              <option value="tag">Tag</option>
+              <option value="shopping-bag">Shopping Bag</option>
+              <option value="utensils">Food / Utensils</option>
+              <option value="car">Car / Transport</option>
+              <option value="receipt">Receipt / Bills</option>
+              <option value="home">Home / Rent</option>
+              <option value="activity">Health / Activity</option>
+              <option value="book-open">Education / Books</option>
+              <option value="film">Entertainment / Film</option>
+              <option value="plane">Travel / Plane</option>
+              <option value="dollar-sign">Dollar / Cash</option>
+              <option value="briefcase">Briefcase / Salary</option>
+              <option value="laptop">Freelance / Tech</option>
+              <option value="trending-up">Trending Up / Business</option>
+              <option value="pie-chart">Investment</option>
+              <option value="gift">Gift</option>
+              <option value="package">Package / Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cat-modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="cat-submit-btn" class="btn btn-primary">Create Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/categories.js"></script>
+</body>
+</html>
