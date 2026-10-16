@@ -23,7 +23,7 @@
         <p>Start tracking your expenses and managing your budget</p>
       </div>
 
-      <div id="auth-alert" class="auth-alert error"></div>
+      <div id="auth-alert" class="auth-alert" style="display: none;"></div>
 
       <form id="register-form" class="auth-form">
         <div class="form-group">
@@ -70,13 +70,19 @@
       const submitBtn = document.getElementById('reg-submit-btn');
 
       const showAlert = (msg) => {
+        alertBox.className = 'auth-alert error';
         alertBox.textContent = msg;
         alertBox.style.display = 'block';
       };
 
+      const hideAlert = () => {
+        alertBox.style.display = 'none';
+        alertBox.textContent = '';
+      };
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alertBox.style.display = 'none';
+        hideAlert();
 
         const name = document.getElementById('reg-name').value.trim();
         const email = document.getElementById('reg-email').value.trim();

@@ -23,7 +23,7 @@
         <p>Sign in to access your financial dashboard</p>
       </div>
 
-      <div id="auth-alert" class="auth-alert error"></div>
+      <div id="auth-alert" class="auth-alert" style="display: none;"></div>
 
       <form id="login-form" class="auth-form">
         <div class="form-group">
@@ -67,12 +67,14 @@
       const demoBtn = document.getElementById('demo-login-btn');
 
       const showAlert = (msg) => {
+        alertBox.className = 'auth-alert error';
         alertBox.textContent = msg;
         alertBox.style.display = 'block';
       };
 
       const hideAlert = () => {
         alertBox.style.display = 'none';
+        alertBox.textContent = '';
       };
 
       form.addEventListener('submit', async (e) => {

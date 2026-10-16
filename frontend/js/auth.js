@@ -1,6 +1,6 @@
 /**
  * Authentication Module using Firebase Authentication SDK
- * with automatic fallback for Quick Demo and unconfigured Firebase projects
+ * Supports both Live Firebase Accounts and One-Click Quick Demo
  */
 
 const Auth = {
@@ -11,7 +11,6 @@ const Auth = {
   async init() {
     if (this.isInitialized) return;
 
-    // Check if Firebase is loaded in the window
     if (window.firebase && window.CONFIG && window.CONFIG.FIREBASE_CONFIG) {
       try {
         if (!firebase.apps.length) {
@@ -19,24 +18,36 @@ const Auth = {
         }
         this.auth = firebase.auth();
 
-        // Listen for Auth State Changes
         await new Promise((resolve) => {
-          const unsubscribe = this.auth.onAuthStateChanged((user) => {
+          let resolved = false;
+
+          this.auth.onAuthStateChanged((user) => {
             if (user) {
               this.user = user;
+              // Clear demo session when a real Firebase user is active
+              localStorage.removeItem('demo_session_user');
+              const realName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+              localStorage.setItem('user_display_name', realName);
             }
-            resolve();
+            if (!resolved) {
+              resolved = true;
+              resolve();
+            }
           });
+
           // Timeout safeguard so page doesn't hang if offline
           setTimeout(() => {
-            if (!this.user) {
-              const stored = localStorage.getItem('demo_session_user');
-              if (stored) {
-                try { this.user = JSON.parse(stored); } catch (e) {}
+            if (!resolved) {
+              resolved = true;
+              if (!this.user) {
+                const stored = localStorage.getItem('demo_session_user');
+                if (stored) {
+                  try { this.user = JSON.parse(stored); } catch (e) {}
+                }
               }
+              resolve();
             }
-            resolve();
-          }, 800);
+          }, 1200);
         });
 
         this.isInitialized = true;
@@ -84,16 +95,19 @@ const Auth = {
 
   getUserProfile() {
     if (!this.user) return null;
+    const email = this.user.email || '';
+    const fallbackName = email ? email.split('@')[0] : 'User';
+
     return {
       uid: this.user.uid,
-      email: this.user.email,
-      displayName: this.user.displayName || localStorage.getItem('user_display_name') || 'Demo User',
+      email: this.user.email || '',
+      displayName: this.user.displayName || localStorage.getItem('user_display_name') || fallbackName,
     };
   },
 
   // Instant one-click Quick Demo login
   async loginDemo() {
-    return this.fallbackLogin('demo@expensetracker.com', 'Demo1234!');
+    return this.fallbackLogin('demouser@gmail.com', 'Demo1234!');
   },
 
   async register(name, email, password) {
@@ -108,12 +122,10 @@ const Auth = {
         localStorage.removeItem('demo_session_user');
         return { success: true, user: this.user };
       } catch (err) {
-        // If Firebase Auth is not yet toggled ON in Firebase console or API key invalid:
         if (
           err.code === 'auth/configuration-not-found' ||
           err.code === 'auth/api-key-not-valid' ||
-          err.code === 'auth/invalid-api-key' ||
-          err.code === 'auth/network-request-failed'
+          err.code === 'auth/invalid-api-key'
         ) {
           console.warn(`[Auth] Firebase Auth returned "${err.code}". Using local demo session for registration.`);
           return this.fallbackRegister(name, email, password);
@@ -146,18 +158,15 @@ const Auth = {
       try {
         const credential = await this.auth.signInWithEmailAndPassword(email, password);
         this.user = credential.user;
-        if (credential.user.displayName) {
-          localStorage.setItem('user_display_name', credential.user.displayName);
-        }
+        const realName = credential.user.displayName || email.split('@')[0];
+        localStorage.setItem('user_display_name', realName);
         localStorage.removeItem('demo_session_user');
         return { success: true, user: this.user };
       } catch (err) {
-        // If Firebase Auth is not yet enabled in Firebase console:
         if (
           err.code === 'auth/configuration-not-found' ||
           err.code === 'auth/api-key-not-valid' ||
-          err.code === 'auth/invalid-api-key' ||
-          err.code === 'auth/network-request-failed'
+          err.code === 'auth/invalid-api-key'
         ) {
           console.warn(`[Auth] Firebase Auth returned "${err.code}". Using local demo session for login.`);
           return this.fallbackLogin(email, password);
@@ -193,6 +202,7 @@ const Auth = {
     }
     this.user = null;
     localStorage.removeItem('demo_session_user');
+    localStorage.removeItem('user_display_name');
     window.location.href = 'login.html';
   },
 
