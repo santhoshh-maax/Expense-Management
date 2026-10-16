@@ -17,6 +17,10 @@
   ],
   "author": "Smart Expense Tracker",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

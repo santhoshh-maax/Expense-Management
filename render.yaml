@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: expense-tracker
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: node backend/src/server.js
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FIREBASE_DATABASE_URL
+        sync: false

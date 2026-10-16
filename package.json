@@ -1,12 +1,26 @@
 {
-  "name": "expense-tracker-root",
+  "name": "expense-tracker",
   "version": "1.0.0",
   "description": "Smart Expense Tracker - Full Stack Web Application",
+  "main": "backend/src/server.js",
   "scripts": {
-    "start": "npm --prefix backend start",
+    "start": "node backend/src/server.js",
+    "build": "cd backend && npm install",
+    "postinstall": "cd backend && npm install",
     "dev": "npm --prefix backend run dev",
     "test": "npm --prefix backend test"
   },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "expense-tracker",
+    "render",
+    "express",
+    "firebase",
+    "finance"
+  ],
   "author": "Smart Expense Tracker",
   "license": "ISC"
 }

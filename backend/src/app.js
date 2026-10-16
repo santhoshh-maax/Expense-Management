@@ -6,6 +6,8 @@ const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const path = require('path');
 
+// Load environment configuration (.env from backend directory and environment variables)
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config();
 
 const { notFoundHandler, errorHandler } = require('./middleware/error.middleware');
