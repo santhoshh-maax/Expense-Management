@@ -159,6 +159,126 @@ const Utils = {
       });
     });
   },
+
+  /**
+   * Initializes mobile drawer, backdrop, close button, and mobile bottom navigation
+   */
+  initMobileNav() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return; // Not an app layout page (e.g. login/register)
+
+    // 1. Ensure backdrop exists
+    let backdrop = document.querySelector('.sidebar-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'sidebar-backdrop';
+      sidebar.parentElement.insertBefore(backdrop, sidebar);
+    }
+
+    // 2. Ensure close button exists in sidebar header
+    const sidebarHeader = sidebar.querySelector('.sidebar-header');
+    if (sidebarHeader && !sidebarHeader.querySelector('.sidebar-close-btn')) {
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'sidebar-close-btn';
+      closeBtn.setAttribute('aria-label', 'Close sidebar navigation');
+      closeBtn.innerHTML = '<i data-lucide="x"></i>';
+      sidebarHeader.appendChild(closeBtn);
+
+      closeBtn.addEventListener('click', () => {
+        sidebar.classList.remove('drawer-open');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    }
+
+    const openDrawer = () => {
+      sidebar.classList.add('drawer-open');
+      backdrop.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeDrawer = () => {
+      sidebar.classList.remove('drawer-open');
+      backdrop.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+
+    // Close when clicking backdrop
+    backdrop.addEventListener('click', closeDrawer);
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('drawer-open')) {
+        closeDrawer();
+      }
+    });
+
+    // Close drawer when clicking a nav item on mobile
+    const navItems = sidebar.querySelectorAll('.nav-item');
+    navItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+          closeDrawer();
+        }
+      });
+    });
+
+    // 3. Inject Mobile Bottom Navigation Bar (if not present)
+    if (!document.getElementById('mobile-bottom-nav')) {
+      const bottomNav = document.createElement('nav');
+      bottomNav.id = 'mobile-bottom-nav';
+      bottomNav.className = 'mobile-bottom-nav';
+      bottomNav.setAttribute('aria-label', 'Mobile Navigation');
+
+      const currentPath = window.location.pathname.toLowerCase();
+      const isDashboard = currentPath.endsWith('dashboard.html') || currentPath === '/' || currentPath.endsWith('/');
+      const isTransactions = currentPath.endsWith('transactions.html');
+      const isBudgets = currentPath.endsWith('budgets.html');
+      const isReports = currentPath.endsWith('reports.html');
+
+      bottomNav.innerHTML = `
+        <a href="dashboard.html" class="mobile-nav-item ${isDashboard ? 'active' : ''}">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Overview</span>
+        </a>
+        <a href="transactions.html" class="mobile-nav-item ${isTransactions ? 'active' : ''}">
+          <i data-lucide="arrow-left-right"></i>
+          <span>Records</span>
+        </a>
+        <a href="budgets.html" class="mobile-nav-item ${isBudgets ? 'active' : ''}">
+          <i data-lucide="target"></i>
+          <span>Budgets</span>
+        </a>
+        <a href="reports.html" class="mobile-nav-item ${isReports ? 'active' : ''}">
+          <i data-lucide="bar-chart-3"></i>
+          <span>Reports</span>
+        </a>
+        <button type="button" class="mobile-nav-item mobile-menu-trigger" aria-label="Open navigation menu">
+          <i data-lucide="menu"></i>
+          <span>Menu</span>
+        </button>
+      `;
+
+      document.body.appendChild(bottomNav);
+
+      const menuTrigger = bottomNav.querySelector('.mobile-menu-trigger');
+      if (menuTrigger) {
+        menuTrigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          openDrawer();
+        });
+      }
+    }
+
+    this.renderIcons();
+  },
 };
 
 window.Utils = Utils;
+
+// Initialize mobile responsiveness automatically once DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  window.Utils.initMobileNav();
+});
+
